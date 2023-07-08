@@ -1,0 +1,14 @@
+[package]
+name = "tcm"
+version = "0.1.0"
+authors = ["Edgar Bermejo @edgarberm_"]
+description = "The Clockwork Maschine is an experimental library that provides a basic implementation for the JavaScript WAA"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wasm-bindgen = "0.2.87"
