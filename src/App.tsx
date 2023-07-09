@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import init, {
-  fibo,
-  fibonacci,
+  InitOutput,
+  add,
   get_wasm_memory_buffer_pointer,
   read_wasm_memory_buffer_and_return_index_one,
   store_value_in_wasm_memory_buffer_index_zero,
@@ -9,21 +9,21 @@ import init, {
 import { Knob } from './components'
 import './styles/App.css'
 
-function fib2(n: number): number {
-  if (n <= 1) return n
+// function fib2(n: number): number {
+//   if (n <= 1) return n
 
-  let prev2 = 0
-  let prev1 = 1
-  let c = 0
+//   let prev2 = 0
+//   let prev1 = 1
+//   let c = 0
 
-  for (let i = 2; i <= n; i++) {
-    c = prev1 + prev2
-    prev2 = prev1
-    prev1 = c
-  }
+//   for (let i = 2; i <= n; i++) {
+//     c = prev1 + prev2
+//     prev2 = prev1
+//     prev1 = c
+//   }
 
-  return c
-}
+//   return c
+// }
 
 // function fib3(n: number): number {
 //   const sol = [0, 1]
@@ -36,20 +36,27 @@ function fib2(n: number): number {
 // }
 
 function App() {
+  const [wasm, setWasm] = useState<InitOutput>()
   const [value, setValue] = useState(0)
 
   useEffect(() => {
+    initializeWasm()
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    // initialize()
   }, [])
 
-  // async function initialize() {
+  async function initializeWasm() {
+    const w = await init()
+
+    setWasm(w)
+    console.log(add(100, -200))
+  }
+
+  // async function init() {
   //   const t2 = performance.now()
   //   const f2 = fib2(100000)
   //   const t3 = performance.now()
   //   console.log(`Fibonacci JS01 es: ${f2} y ha tardado ${t3 - t2}ms`)
 
-  //   const wasm = await init()
   //   const t0 = performance.now()
   //   const f = fibonacci(100000)
   //   const t1 = performance.now()
@@ -84,25 +91,39 @@ function App() {
 
   //   // Then, let's have wasm read index one of the buffer,
   //   // and return the result
-  //   console.log(read_wasm_memory_buffer_and_return_index_one())
+  //   read()
   // }
+
+  function read() {
+    const pointer = get_wasm_memory_buffer_pointer()
+    console.log(pointer)
+    console.log(read_wasm_memory_buffer_and_return_index_one())
+  }
 
   const handleKnobChange = (value: number) => {
     // console.log(value / 10)
     setValue(value)
+    store_value_in_wasm_memory_buffer_index_zero(value)
+    read()
+
+    // const sto = window.setTimeout(() => {
+    //   read()
+    //   window.clearTimeout(sto)
+    // }, 100)
   }
 
   return (
     <>
       <h1>Vite + React + WASM</h1>
+      <h2 id='rust-title'></h2>
 
       <Knob
         size={60}
         degrees={264}
-        min={-10}
-        max={10}
+        min={0}
+        max={255}
         value={value}
-        label='Knob'
+        label='Knob Hz'
         onChange={handleKnobChange}
       />
     </>
