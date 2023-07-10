@@ -36,8 +36,11 @@ import './styles/App.css'
 // }
 
 function App() {
+  const audioContext = new AudioContext()
   const [wasm, setWasm] = useState<InitOutput>()
-  const [value, setValue] = useState(0)
+  const [value, setValue] = useState(5)
+
+  let volume: GainNode
 
   useEffect(() => {
     initializeWasm()
@@ -94,17 +97,18 @@ function App() {
   //   read()
   // }
 
-  function read() {
-    const pointer = get_wasm_memory_buffer_pointer()
-    console.log(pointer)
-    console.log(read_wasm_memory_buffer_and_return_index_one())
-  }
+  // function read() {
+  //   const pointer = get_wasm_memory_buffer_pointer()
+  //   console.log(pointer)
+  //   console.log(read_wasm_memory_buffer_and_return_index_one())
+  // }
 
   const handleKnobChange = (value: number) => {
     // console.log(value / 10)
     setValue(value)
-    store_value_in_wasm_memory_buffer_index_zero(value)
-    read()
+    volume.gain.value = value / 10
+    // store_value_in_wasm_memory_buffer_index_zero(value)
+    // read()
 
     // const sto = window.setTimeout(() => {
     //   read()
@@ -112,20 +116,63 @@ function App() {
     // }, 100)
   }
 
+  const startAudio = async (context: AudioContext) => {
+    const oscillator = new OscillatorNode(context)
+    volume = new GainNode(context, { gain: 0.5 })
+    const dummy = new AudioWorkletNode(context, 'dummy')
+
+    dummy.port.onmessage = (event) => {
+      console.log(event.data)
+
+      dummy.port.postMessage('Nice!')
+    }
+
+    const now = audioContext.currentTime
+    const end = now + 5.0
+
+    const param = dummy.parameters.get('gain') as AudioParam
+    param.value = 1.0
+    param.linearRampToValueAtTime(0.0, end)
+
+    oscillator.connect(dummy).connect(context.destination)
+    oscillator.start()
+    /** @note end - 0.0025 is for avoid the clicking sound when osc stopping */
+    oscillator.stop(end - 0.0025)
+
+    oscillator.onended = () => {
+      console.log('Oscillator endeed!')
+      oscillator.disconnect()
+    }
+  }
+
+  const makeWhiteNoise = async () => {
+    // Load our processor (AudioWorkletNode)
+    await audioContext.audioWorklet.addModule('../worklet/DummyProcessor.js')
+
+    startAudio(audioContext)
+    audioContext.resume()
+  }
+
   return (
     <>
       <h1>Vite + React + WASM</h1>
       <h2 id='rust-title'></h2>
 
-      <Knob
-        size={60}
-        degrees={264}
-        min={0}
-        max={255}
-        value={value}
-        label='Knob Hz'
-        onChange={handleKnobChange}
-      />
+      <div style={{ marginTop: 60 }}>
+        <button onClick={makeWhiteNoise}>Make white noise! 🔊</button>
+      </div>
+
+      <div style={{ marginTop: 60 }}>
+        <Knob
+          size={60}
+          degrees={264}
+          min={0}
+          max={10}
+          value={value}
+          label='Knob Hz'
+          onChange={handleKnobChange}
+        />
+      </div>
     </>
   )
 }
