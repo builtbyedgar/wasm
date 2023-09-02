@@ -23,9 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
-
-tcm/target
-tcm/pkg
+pkg
+target
+Cargo.lock
 
 
 .SD_Store

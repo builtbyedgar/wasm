@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello Wasm</title>
+  </head>
+  <body>
+    <button class="start">Start</button>
+    <button class="stop">Stop</button>
+
+    <script type="module">
+      import init, { FMOscillator } from './pkg/audio.js'
+
+      const start = document.querySelector('.start')
+      const stop = document.querySelector('.stop')
+      let osc = null
+
+      async function initialize() {
+        await init()
+
+        start.addEventListener('click', play, false)
+        stop.addEventListener('click', pause, false)
+
+        console.log(FMOscillator)
+      }
+
+      function play() {
+        osc = new FMOscillator()
+        osc.set_note(50)
+        osc.set_fm_frequency(0)
+        osc.set_fm_amount(0)
+        osc.set_gain(0.8)
+      }
+
+      function pause() {
+        osc.free()
+        osc = null
+      }
+
+      initialize()
+    </script>
+  </body>
+</html>
