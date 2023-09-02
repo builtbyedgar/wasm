@@ -26,3 +26,6 @@ dist-ssr
 
 tcm/target
 tcm/pkg
+
+
+.SD_Store
