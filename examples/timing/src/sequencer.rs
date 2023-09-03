@@ -1,71 +1,80 @@
+use std::sync::mpsc;
 use std::time::Duration;
 
 struct Cell {
-  channel: u8,
-  note: u8,
-  active: bool,
+    channel: u8,
+    note: u8,
+    active: bool,
 }
 
 impl Cell {
-  fn new(note: u8) -> Cell {
-      Cell {
-          channel: 0,
-          note: note,
-          active: false,
-      }
-  }
-  
-  fn bang(&mut self) -> bool {
-      false
-  }
+    fn new(note: u8) -> Cell {
+        Cell {
+            channel: 0,
+            note: note,
+            active: false,
+        }
+    }
+
+    fn bang(&mut self) -> bool {
+        false
+    }
 }
 
-// 
 pub struct Sequencer {
-  cells: Vec<Cell>,
-  notes: Vec<(u8, u8)>,
-  ctr: u32,
-  pub tick: Duration,
+    cells: Vec<Cell>,
+    notes: Vec<(u8, u8)>,
+    ctr: u32,
+    pub tick: Duration,
 }
 
 pub fn new(bpm: f32) -> Sequencer {
-  Sequencer {
-    cells: vec![],
-    notes: vec![],
-    ctr: 0,
-    tick: Duration::from_millis((60_000.0 / (bpm * 24.0)) as u64),
-  }
+    Sequencer {
+        cells: vec![],
+        notes: vec![],
+        ctr: 0,
+        tick: Duration::from_millis((60_000.0 / (bpm * 24.0)) as u64),
+    }
 }
 
 impl Sequencer {
-  fn note_off(&mut self) {
-    println!("note off");
-  }
-  
-  pub fn tick(&mut self) {
-    self.ctr = (self.ctr + 1) % 24;
+    fn note_off(&mut self) {
+        // TODO: implement
+        println!("note off");
+    }
 
-    self.note_off();
+    pub fn tick(&mut self) {
+        self.ctr = (self.ctr + 1) % 24;
 
-    // note on
-    let x = rand::random::<usize>() % self.cells.len();
-    let x = &self.cells[x];
+        self.note_off();
 
-    // let note: u8 = 60;
-    // let event = MidiMessage { ... }
-    self.notes.push((x.channel, x.note));
+        // note on
+        let x = rand::random::<usize>() % self.cells.len();
+        let x = &self.cells[x];
 
-    // Send the event to midi
-  }
-}
+        let note: u8 = 60;
+        // Crea un evento MIDI
+        // let event = MidiEvent {
+        //     status: 0x90 + x.channel,
+        //     data1: x.note,
+        //     data2: 64,
+        // };
 
-pub fn from_string() -> Sequencer {
-    let y = 12 * 3;
+        self.notes.push((x.channel, x.note));
+        println!("{:?}", self.notes);
 
-    Sequencer {
-        cells: vec![Cell::new(y + 0)],
-        notes: vec![],
-        ctr: 0,
-        tick: Duration::from_millis(1000 / 24),
+        // Envía el evento MIDI a través del canal
+        // self.tx.send(event).expect("Error sending MIDI event");
     }
 }
+
+// pub fn from_string() -> Sequencer {
+//     let y = 12 * 3;
+
+//     Sequencer {
+//         cells: vec![Cell::new(y + 0)],
+//         notes: vec![],
+//         ctr: 0,
+//         tick: Duration::from_millis(1000 / 24),
+//     }
+// }

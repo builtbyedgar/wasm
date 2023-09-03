@@ -33,9 +33,9 @@ fn main() {
         // Util para tener múltiples propietarios que puedan enviar datos al canal.
         // Al clonarlo puedo pasarlo a diferentes hilos o partes del programa, y cada uno
         // podrá enviar datos al mismo canal de forma independiente.
-        let tx = mpsc::Sender::clone(&tx);
+        let tx_clone = mpsc::Sender::clone(&tx);
 
-        let mut seq = sequencer::from_string();
+        let mut seq = sequencer::new(120.0);
         // Crea un nuevo subproceso y comienza a ejecutar el código dentro del bloque de cierre.
         // El subproceso se inicia con un nuevo hilo y se le asigna a la variable sub.
         let sub = thread::spawn(move || {
@@ -58,16 +58,17 @@ fn main() {
                 // Incrementar en la instancia e igualarlo
                 seq.tick();
                 tick += seq.tick;
-                println!("Tick");
 
                 // Establece el subproceso en un estado de espera.
                 thread::park_timeout(tick - accuracy - Instant::now());
             }
         });
 
+
+
         // TODO: dev only
         // Espera durante un tiempo para que el subproceso tenga tiempo de ejecutarse.
-        thread::sleep(Duration::from_secs(10));
+        thread::sleep(Duration::from_secs(3));
         // Asegúra que el subproceso termine antes de salir.
         let _ = sub.join();
     }
