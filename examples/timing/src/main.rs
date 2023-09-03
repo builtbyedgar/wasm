@@ -17,10 +17,10 @@ impl<F> Clock<F> where F: FnMut() + Send + Sync + 'static {
     }
 
     // Inicia un hilo que ejecuta el bucle principal.
-    fn start(self) {
+    fn start(self) -> Result<(), Box<dyn std::error::Error>> {
         let callback = self.callback.clone();
 
-        let _ = thread::spawn(move || {
+        let handle = thread::spawn(move || {
             let mut expected = Instant::now() + self.interval;
 
             
@@ -37,16 +37,20 @@ impl<F> Clock<F> where F: FnMut() + Send + Sync + 'static {
                 );
             }
         });
+
+        handle.join()?;
+        Ok(())
     }
 }
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     fn callback_fn() {
         println!("Callback function called");
     }
 
     let t = Clock::new(Duration::from_secs(1), callback_fn);
-    t.start();
+    t.start()?;
 
     thread::sleep(Duration::from_secs(10));
+    Ok(())
 }
