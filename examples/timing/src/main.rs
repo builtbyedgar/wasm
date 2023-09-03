@@ -26,6 +26,7 @@ impl<F> Clock<F> where F: FnMut() + Send + Sync + 'static {
         let callback = self.callback.clone();
         let should_stop = self.should_stop.clone();
 
+        // Se encarga de crear un nuevo hilo de ejecución independiente del hilo principal.
         let handle = thread::spawn(move || {
             let mut expected = Instant::now() + self.interval;
 
