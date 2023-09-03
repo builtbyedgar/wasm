@@ -1,0 +1,12 @@
+[package]
+name = "timing"
+version = "0.1.0"
+edition = "2021"
+authors = ["Edgar Bermejo <eledgaar@gmail.com>"]
+description = "Sync some noise."
+
+# [lib]
+# crate-type = ["cdylib"]
+
+[dependencies]
+rand = "0.8.5"

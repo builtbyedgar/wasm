@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timing</title>
+  </head>
+  <body>
+    <button class="start">Start</button>
+    <button class="stop">Stop</button>
+
+    <script type="module">
+      import init from './pkg/timing.js'
+
+      async function initialize() {
+        await init()
+      }
+
+      initialize()
+    </script>
+  </body>
+</html>

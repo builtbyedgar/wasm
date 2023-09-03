@@ -24,3 +24,4 @@ The examples below are based on the official documentation for Wasm, Rust, wasm-
 
 - [Hello Wasm](./examples/hello-wasm/README.md) is the mos simple example. It shows how to compile Rust to Wasm and run it in the browser.
 - [Audio](./examples/audio/README.md). In this example we will try to implement a FMOscillator in Rust.
+- [Timing](./examples/timing/README.md). Try to sync some noise.
